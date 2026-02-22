@@ -9,6 +9,11 @@ This repo is built with the help of agents. Keep these rules so the work stays c
 - Keep external dependencies minimal.
 - Tests are required for each change unless impossible; accompany changes with a unit or integration test and document exceptions.
 - Add comments above every line of code (unless a file explicitly opts out).
+- When proposing or discussing next steps, educate the user, present options, and collaborate to choose the best path.
+- After each change is applied, explain what was changed and why in clear, beginner-friendly terms.
+- Only show command output for OS build/run/test actions; omit outputs for git or unrelated tooling.
+- As an educator, include simple diagrams in documentation when they help explain memory layout, boot flow, or architecture.
+- Before every push to GitHub, ensure all markdown documentation is up to date and reflects recent changes.
 
 ## Workflow
 - For each milestone, maintain a checklist in `docs/ROADMAP.md`.

@@ -1,7 +1,7 @@
 # Status
 
 ## Current Milestone
-- M0: Toolchain + build skeleton
+- M1: Boot into 64-bit kernel and print a message
 
 ## Done
 - Repo scaffolded
@@ -9,9 +9,11 @@
 - Bootloader decided: Multiboot2 + GRUB2
 - Toolchain decided: `x86_64-elf` cross-compiler
 - Toolchain built: binutils + gcc installed at `/home/ubuntu/opt/cross`
+- Build/run/test skeleton added (Makefile, linker script, GRUB config, QEMU run target)
 
 ## Next
-- Add build/run/test skeleton
+- Add long-mode bring-up code and a simple serial print
+- Update boot path to 64-bit and print a message
 
 ## Blockers / Questions
 - None yet
@@ -54,3 +56,25 @@
 - Command: `cd /home/ubuntu/code/vibeos && PATH="/home/ubuntu/opt/cross/bin:$PATH" tests/test_toolchain.sh`
   Output:
   - `OK: x86_64-elf-gcc is available`
+- Command: `cd /home/ubuntu/code/vibeos && PATH="/home/ubuntu/opt/cross/bin:$PATH" tests/test_build.sh`
+  Output:
+  - `make: Entering directory '/home/ubuntu/code/vibeos'`
+  - `rm -rf build`
+  - `make: Leaving directory '/home/ubuntu/code/vibeos'`
+  - `make: Entering directory '/home/ubuntu/code/vibeos'`
+  - `mkdir -p build`
+  - `x86_64-elf-as --32 kernel/entry.S -o build/entry.o`
+  - `x86_64-elf-ld -m elf_i386 -T kernel/linker.ld -o build/kernel.elf build/entry.o`
+  - `x86_64-elf-ld: warning: build/kernel.elf has a LOAD segment with RWX permissions`
+  - `make: Leaving directory '/home/ubuntu/code/vibeos'`
+  - `OK: build/kernel.elf built`
+- Command: `cd /home/ubuntu/code/vibeos && make iso`
+  Output:
+  - `grub-mkrescue -o build/vibeos.iso build/iso`
+  - `xorriso 1.5.6 : RockRidge filesystem manipulator, libburnia project.`
+  - `ISO image produced: 5801 sectors`
+  - `Writing to 'stdio:build/vibeos.iso' completed successfully.`
+- Command: `cd /home/ubuntu/code/vibeos && make run`
+  Output:
+  - `qemu-system-x86_64 -cdrom build/vibeos.iso -display none -serial stdio -no-reboot -no-shutdown`
+  - `No serial output (kernel currently halts immediately).`

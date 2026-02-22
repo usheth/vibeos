@@ -3,8 +3,8 @@
 This roadmap is a working plan. It will change as we explore and learn.
 
 ## Current Focus (next 1–3 items)
-- Establish a build/run/test skeleton
-- Learn: core terms in `docs/GLOSSARY.md` (compiler, linker, bootloader, ELF, Multiboot2)
+- Boot a 64-bit kernel and print a message (M1)
+- Decide the minimal long-mode bring-up steps
 
 ## Exploration / Options
 - Bootloader: Multiboot2 (GRUB2), Limine, UEFI
@@ -21,6 +21,7 @@ This roadmap is a working plan. It will change as we explore and learn.
 
 ## Completed
 - `x86_64-elf` cross-compiler toolchain built
+- Build/run/test skeleton in place (Makefile, linker script, GRUB config, QEMU run target)
 
 ## Notes
 - Any milestone can be split, merged, or removed.
