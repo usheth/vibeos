@@ -6,6 +6,7 @@ This roadmap is a working plan. It will change as we explore and learn.
 - Decide bootloader path: Multiboot2 + GRUB2 vs Limine
 - Choose toolchain approach: cross-compiler vs host toolchain
 - Establish a build/run/test skeleton
+ - Learn: core terms in `docs/GLOSSARY.md` (compiler, linker, bootloader, ELF, Multiboot2)
 
 ## Exploration / Options
 - Bootloader: Multiboot2 (GRUB2), Limine, UEFI
