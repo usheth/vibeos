@@ -8,7 +8,7 @@ Minimal x86_64 Unix-like OS for learning OS development, systems programming, an
 - Learn toolchains, low-level debugging, and systems design.
 
 ## Status
-M0 complete (toolchain + build skeleton). M1 next: boot into 64-bit long mode and print a message.
+M0 complete (toolchain + build skeleton). M1 next: print a message in 32-bit protected mode (long mode later).
 
 ## Next
 See `docs/ROADMAP.md` and `docs/DECISIONS.md`.

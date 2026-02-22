@@ -3,8 +3,8 @@
 This roadmap is a working plan. It will change as we explore and learn.
 
 ## Current Focus (next 1–3 items)
-- Boot a 64-bit kernel and print a message (M1)
-- Decide the minimal long-mode bring-up steps
+- Boot a 32-bit kernel and print a message (M1)
+- Plan the long-mode bring-up steps
 
 ## Exploration / Options
 - Bootloader: Multiboot2 (GRUB2), Limine, UEFI

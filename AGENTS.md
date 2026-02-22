@@ -17,6 +17,8 @@ This repo is built with the help of agents. Keep these rules so the work stays c
 - Keep `README.md` updated with the current kernel design/specs whenever kernel-related changes are made.
 - When updating kernel design/specs in `README.md`, include as much detail as practical and reference relevant glossary entries.
 - Provide step-by-step explanations (not just definitions) in `README.md` for boot flow, linking/layout, memory map, and build pipeline.
+- When the user asks “what is X”, ask whether X should be added to `docs/GLOSSARY.md`.
+- When the user selects a strategic or tactical option, record it in `docs/DECISIONS.md`.
 - When introducing new file types or build concepts, add or update entries in `docs/GLOSSARY.md`.
 - Do not create files named `all`, `kernel`, `iso`, `run`, or `clean` to avoid Make target conflicts.
 - Only create a milestone document after that milestone is completed.
