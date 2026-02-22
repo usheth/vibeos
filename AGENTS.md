@@ -16,6 +16,7 @@ This repo is built with the help of agents. Keep these rules so the work stays c
 - When adding tooling, explain how it works and how to inspect/debug it.
 - Add or update tests alongside every change; if not possible, document why.
 - Keep `docs/DECISIONS.md` and `docs/LEARNING.md` updated as choices are made and lessons are learned.
+- For every status recorded in `STATUS.md`, verify it and attach console output when possible.
 
 ## Test Exceptions
 Use sparingly and document the reason:
