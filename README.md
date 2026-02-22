@@ -8,19 +8,103 @@ Minimal x86_64 Unix-like OS for learning OS development, systems programming, an
 - Learn toolchains, low-level debugging, and systems design.
 
 ## Status
-Empty scaffold. First milestone: boot a 64-bit kernel that prints a message.
+M0 complete (toolchain + build skeleton). M1 next: boot into 64-bit long mode and print a message.
 
 ## Next
-See `docs/ROADMAP.md` and `docs/LEARNING.md`.
+See `docs/ROADMAP.md` and `docs/DECISIONS.md`.
 
 ## Build/Run
 - `make kernel` builds the minimal Multiboot2 kernel ELF into `build/kernel.elf`.
 - `make iso` builds a bootable GRUB2 ISO at `build/vibeos.iso` (requires `grub-mkrescue`).
-- `make run` runs the ISO in QEMU with serial output on stdio.
+- `make run` runs the ISO in QEMU headless with serial output on stdio.
 
 ## Inspect/Debug
 - Inspect the ELF with `x86_64-elf-objdump -h build/kernel.elf`.
-- Run QEMU with a GDB stub using `qemu-system-x86_64 -cdrom build/vibeos.iso -serial stdio -s -S`, then connect with `x86_64-elf-gdb`.
+- Run QEMU with a GDB stub using `qemu-system-x86_64 -cdrom build/vibeos.iso -display none -serial stdio -s -S`, then connect with `x86_64-elf-gdb`.
+
+## Kernel Design (Current)
+This is the *exact* state of the kernel today, with pointers to glossary terms.
+
+**Boot protocol**
+- **Multiboot2**: a standard contract that tells GRUB how to recognize and load our kernel (see `docs/GLOSSARY.md`: Multiboot2, Multiboot2 Header)
+- **Bootloader**: GRUB2, which reads `grub.cfg`, loads the ELF, and jumps to our entry point (see `docs/GLOSSARY.md`: Bootloader)
+- **Boot config**: `boot/grub.cfg` uses `multiboot2 /boot/kernel.elf`
+**Boot flow (step‑by‑step)**
+1. **GRUB starts** and reads `boot/grub.cfg`.
+2. The `multiboot2 /boot/kernel.elf` line tells GRUB to treat the file as a Multiboot2 kernel.
+3. **GRUB scans the kernel file** for a Multiboot2 header (the magic value + checksum must validate).
+4. If valid, **GRUB reads the ELF program headers** to learn which segments to load and where.
+5. **GRUB loads the segments into memory** at the specified addresses (currently starting at 1 MiB).
+6. **GRUB jumps to the entry point** (`start` in `kernel/entry.S`) and transfers control to our code.
+
+**CPU mode and entry**
+- **CPU mode on entry**: 32-bit protected mode (GRUB hands off in 32-bit)
+- **Entry point**: `kernel/entry.S` symbol `start` (assembly source processed by the preprocessor; see `docs/GLOSSARY.md`: .S)
+- **Execution flow**:
+  - `cli` disables interrupts
+  - stack pointer set to `stack_top` in `.bss`
+  - `hlt` loop to halt safely
+**Why these steps exist**
+- We disable interrupts to avoid unexpected CPU state changes before we set up handlers.
+- We set a stack because almost every useful operation (calls, pushes, interrupts) depends on it.
+- We halt in a loop because we have no scheduler, no idle task, and no output yet; halting is safe and deterministic.
+
+**Binary format and layout**
+- **ELF format**: `elf32-i386`, which stores sections and metadata so loaders know what to load and where (see `docs/GLOSSARY.md`: ELF)
+- **Linker script**: `kernel/linker.ld`, which decides where each section lives in memory (see `docs/GLOSSARY.md`: Linker Script, .ld)
+- **Load address**: 1 MiB (`0x0010_0000`) via `. = 1M;` in the linker script
+- **Sections present**:
+  - `.multiboot2` (header required by GRUB to recognize the kernel)
+  - `.text` (executable code; includes `start`)
+  - `.bss` (zero-initialized data; holds the early 4 KiB stack)
+- **Addressing**:
+  - Section VMAs/LMAs currently match, so “where it runs” equals “where it is loaded” (see `docs/GLOSSARY.md`: VMA, LMA)
+  - Addresses come from ELF program headers emitted by the linker based on the linker script
+**How `.S` + `.ld` become `kernel.elf` (step‑by‑step)**
+1. `kernel/entry.S` is assembled into `build/entry.o` (machine code + section metadata).
+2. The linker reads `kernel/linker.ld` to set the base address and section order.
+3. The linker merges sections from `entry.o` into a single ELF file.
+4. The linker emits **program headers** that describe how GRUB should load the kernel into memory.
+5. The result is `build/kernel.elf`, which GRUB can load.
+
+**Memory map snapshot**
+- The memory map diagram below is derived from:
+  - `x86_64-elf-objdump -h build/kernel.elf`
+- Current key addresses:
+  - `.multiboot2` VMA `0x0010_0000`
+  - `.text` VMA `0x0010_0000`
+  - `.bss`  VMA `0x0010_0010` (size `0x1000`)
+**Why 1 MiB**
+- The region below 1 MiB contains legacy BIOS data and is traditionally avoided.
+- 1 MiB is a conventional, well‑understood starting point for early kernels.
+
+**I/O and output**
+- **Output**: none yet (no serial/VGA printing in M0)
+- **Reason**: the current entry code only halts; no print routine is linked
+
+## Build Pipeline (Detailed)
+This describes what each Makefile target does and why.
+
+- **`make kernel`**
+  - Assembles `kernel/entry.S` into `build/entry.o`.
+  - Links `build/entry.o` with `kernel/linker.ld` to produce `build/kernel.elf`.
+  - Result: a Multiboot2‑compatible 32‑bit ELF kernel.
+
+- **`make iso`**
+  - Creates a staging directory at `build/iso/boot/grub`.
+  - Copies `build/kernel.elf` to `build/iso/boot/kernel.elf`.
+  - Copies `boot/grub.cfg` to `build/iso/boot/grub/grub.cfg`.
+  - Runs `grub-mkrescue` to produce `build/vibeos.iso`.
+  - Result: a bootable ISO GRUB can start in QEMU.
+
+- **`make run`**
+  - Runs QEMU headless with `-display none`.
+  - Routes serial output to the terminal with `-serial stdio`.
+  - Uses `-no-reboot -no-shutdown` to keep the session visible on exit.
+  - Result: an emulated boot of the ISO (currently no output because the kernel halts).
+
+- **`make clean`**
+  - Deletes the `build/` directory so the next build starts fresh.
 
 ## Memory Map (Early Boot)
 Below is a simplified, not-to-scale view of where the kernel is loaded right now.

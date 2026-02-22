@@ -14,6 +14,9 @@ This repo is built with the help of agents. Keep these rules so the work stays c
 - Only show command output for OS build/run/test actions; omit outputs for git or unrelated tooling.
 - As an educator, include simple diagrams in documentation when they help explain memory layout, boot flow, or architecture.
 - Before every push to GitHub, ensure all markdown documentation is up to date and reflects recent changes.
+- Keep `README.md` updated with the current kernel design/specs whenever kernel-related changes are made.
+- When updating kernel design/specs in `README.md`, include as much detail as practical and reference relevant glossary entries.
+- Provide step-by-step explanations (not just definitions) in `README.md` for boot flow, linking/layout, memory map, and build pipeline.
 - When introducing new file types or build concepts, add or update entries in `docs/GLOSSARY.md`.
 - Do not create files named `all`, `kernel`, `iso`, `run`, or `clean` to avoid Make target conflicts.
 - Only create a milestone document after that milestone is completed.
@@ -21,10 +24,9 @@ This repo is built with the help of agents. Keep these rules so the work stays c
 
 ## Workflow
 - For each milestone, maintain a checklist in `docs/ROADMAP.md`.
-- Keep a short learning log in `docs/LEARNING.md`.
 - When adding tooling, explain how it works and how to inspect/debug it.
 - Add or update tests alongside every change; if not possible, document why.
-- Keep `docs/DECISIONS.md` and `docs/LEARNING.md` updated as choices are made and lessons are learned.
+- Keep `docs/DECISIONS.md` updated as choices are made and lessons are learned.
 - For every status recorded in `STATUS.md`, verify it and attach console output when possible.
 
 ## Test Exceptions
