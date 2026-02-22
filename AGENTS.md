@@ -8,12 +8,14 @@ This repo is built with the help of agents. Keep these rules so the work stays c
 - Document *why* decisions are made.
 - Keep external dependencies minimal.
 - Tests are required for each change unless impossible; accompany changes with a unit or integration test and document exceptions.
+- Add comments above every line of code (unless a file explicitly opts out).
 
 ## Workflow
 - For each milestone, maintain a checklist in `docs/ROADMAP.md`.
 - Keep a short learning log in `docs/LEARNING.md`.
 - When adding tooling, explain how it works and how to inspect/debug it.
 - Add or update tests alongside every change; if not possible, document why.
+- Keep `docs/DECISIONS.md` and `docs/LEARNING.md` updated as choices are made and lessons are learned.
 
 ## Test Exceptions
 Use sparingly and document the reason:

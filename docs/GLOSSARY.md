@@ -22,6 +22,10 @@ Think of it as a “map” for where code/data should go.
 A tiny program that starts *before* your OS. It loads your kernel into memory and jumps to it.
 Examples: GRUB, Limine.
 
+## Binutils
+GNU Binary Utilities: assembler, linker, and binary inspection tools (`as`, `ld`, `objdump`, `readelf`, `nm`).
+GCC uses these tools to assemble and link code for the target.
+
 ## Multiboot
 A standard “contract” between a bootloader and a kernel.
 If your kernel follows the contract, the bootloader knows how to load it and pass info to it.
@@ -34,6 +38,11 @@ A small data block embedded in your kernel file that tells the bootloader:
 A common file format for executables and object files on Unix-like systems.
 Your kernel will be an ELF file so the bootloader/linker know how to load it.
 
+## Freestanding (C environment)
+Compilation mode for code that runs without a host OS or standard C library.
+In freestanding mode the compiler does not assume `main()` or startup files exist,
+and you typically avoid linking against libc.
+
 ## Kernel
 The core program of an operating system. It runs in full control of the machine and manages memory,
 processes, devices, and system calls.
@@ -43,4 +52,3 @@ A file that represents a bootable CD/DVD. We use it to bundle GRUB + the kernel 
 
 ## QEMU
 An emulator that lets us run our OS in a virtual machine instead of real hardware.
-

@@ -3,10 +3,8 @@
 This roadmap is a working plan. It will change as we explore and learn.
 
 ## Current Focus (next 1–3 items)
-- Decide bootloader path: Multiboot2 + GRUB2 vs Limine
-- Choose toolchain approach: cross-compiler vs host toolchain
 - Establish a build/run/test skeleton
- - Learn: core terms in `docs/GLOSSARY.md` (compiler, linker, bootloader, ELF, Multiboot2)
+- Learn: core terms in `docs/GLOSSARY.md` (compiler, linker, bootloader, ELF, Multiboot2)
 
 ## Exploration / Options
 - Bootloader: Multiboot2 (GRUB2), Limine, UEFI
@@ -22,7 +20,7 @@ This roadmap is a working plan. It will change as we explore and learn.
 - M5: Minimal Unix-like syscall interface
 
 ## Completed
-- (none yet)
+- `x86_64-elf` cross-compiler toolchain built
 
 ## Notes
 - Any milestone can be split, merged, or removed.

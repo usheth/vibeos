@@ -6,10 +6,11 @@
 ## Done
 - Repo scaffolded
 - Initial roadmap/logging structure added
+- Bootloader decided: Multiboot2 + GRUB2
+- Toolchain decided: `x86_64-elf` cross-compiler
+- Toolchain built: binutils + gcc installed at `/home/ubuntu/opt/cross`
 
 ## Next
-- Decide bootloader: Multiboot2 + GRUB2 or Limine
-- Decide toolchain: cross-compiler vs host toolchain
 - Add build/run/test skeleton
 
 ## Blockers / Questions
