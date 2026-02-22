@@ -82,3 +82,23 @@ In our early boot, the VMA is still used even before we set up paging.
 ## LMA (Load Memory Address)
 The address where a section is loaded into memory by the bootloader.
 For our kernel, VMA and LMA are the same because we are not relocating sections yet.
+
+## Long Mode
+The 64-bit CPU mode on x86-64 processors.
+Entering long mode requires enabling PAE, setting up page tables, enabling the long mode bit in EFER, and turning on paging.
+
+## PAE (Physical Address Extension)
+A paging mode that expands page table entries and allows the CPU to access more physical memory.
+On x86-64, PAE must be enabled before entering long mode.
+Enabling PAE is done by setting the PAE bit in CR4.
+With PAE, page tables use 64-bit entries and add an extra level (PDPT → Page Directory → Page Table),
+which is why the CPU can address more than 4 GiB of physical memory.
+
+## EFER (Extended Feature Enable Register)
+An x86 Model-Specific Register (MSR) that controls extended CPU features.
+The Long Mode Enable (LME) bit inside EFER must be set before the CPU can enter long mode.
+EFER is accessed via the `rdmsr` and `wrmsr` instructions.
+
+## CR4 (Control Register 4)
+An x86 control register used to enable or disable processor features.
+The PAE bit in CR4 must be set before entering long mode.
