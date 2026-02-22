@@ -33,13 +33,11 @@ High memory
 │              Free/unused (for now)          │
 │                                              │
 ├──────────────────────────────────────────────┤
-│ Kernel image (ELF sections) @ 1 MiB          │
-│ - .multiboot2 header                          │
-│ - .text (code)                                │
-│ - .rodata (read-only data)                    │
-│ - .data (read/write data)                     │
-│ - .bss (zeroed)                                │
-│   - early stack (4 KiB)                        │
+│ Kernel image (ELF sections) @ 0x0010_0000    │
+│ - .text       VMA 0x0010_0000  (size 0x9)     │
+│ - .multiboot2 VMA 0x0010_0000  (size 0x18)    │
+│ - .bss        VMA 0x0010_0010  (size 0x1000)  │
+│   - early stack (4 KiB)                       │
 ├──────────────────────────────────────────────┤
 │ Conventional memory below 1 MiB              │
 │ (BIOS area, reserved, legacy)                │
@@ -50,3 +48,7 @@ Low memory
 Why this matters:
 - It shows **where** the CPU starts executing your kernel (the 1 MiB region).
 - It explains **why** we need a linker script: without it, the kernel could be placed unpredictably.
+- The addresses above come from `x86_64-elf-objdump -h build/kernel.elf`.
+
+Note:
+- `.text` and `.multiboot2` both show VMA `0x0010_0000` because the linker script anchors the location counter at 1 MiB and then places sections in order. The actual bytes are laid out sequentially; the section table just shows the start address for each section. If you want this to be clearer, we can force `.multiboot2` to start at 1 MiB and then explicitly advance the location counter before `.text`.

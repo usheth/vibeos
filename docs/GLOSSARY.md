@@ -18,6 +18,14 @@ It also decides *where in memory* the code and data will live. For kernels, this
 A small script that tells the linker how to arrange the kernel in memory.
 Think of it as a “map” for where code/data should go.
 
+## .S (Assembly Source)
+An assembly source file that is run through the C preprocessor before assembling.
+We use `.S` for early boot code that the CPU runs first.
+
+## .ld (Linker Script File)
+The file extension commonly used for linker scripts.
+Our `.ld` file tells the linker where to place kernel sections in memory.
+
 ## Bootloader
 A tiny program that starts *before* your OS. It loads your kernel into memory and jumps to it.
 Examples: GRUB, Limine.
@@ -52,6 +60,10 @@ We use BSS for things like the early stack so the file stays small.
 Compilation mode for code that runs without a host OS or standard C library.
 In freestanding mode the compiler does not assume `main()` or startup files exist,
 and you typically avoid linking against libc.
+
+## Phony Target (Make)
+A Makefile target that is not a real file.
+Marking a target as `.PHONY` forces the commands to run even if a file with that name exists.
 
 ## Kernel
 The core program of an operating system. It runs in full control of the machine and manages memory,

@@ -14,6 +14,7 @@ This repo is built with the help of agents. Keep these rules so the work stays c
 - Only show command output for OS build/run/test actions; omit outputs for git or unrelated tooling.
 - As an educator, include simple diagrams in documentation when they help explain memory layout, boot flow, or architecture.
 - Before every push to GitHub, ensure all markdown documentation is up to date and reflects recent changes.
+- When introducing new file types or build concepts, add or update entries in `docs/GLOSSARY.md`.
 
 ## Workflow
 - For each milestone, maintain a checklist in `docs/ROADMAP.md`.
