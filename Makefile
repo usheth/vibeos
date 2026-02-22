@@ -27,13 +27,9 @@ ISO_GRUB := $(ISO_BOOT)/grub
 # GRUB configuration path.
 GRUB_CFG := boot/grub.cfg
 
-# Phony target declaration for all.
-.PHONY: all
 # Default target builds the kernel.
 all: kernel
 
-# Phony target declaration for kernel.
-.PHONY: kernel
 # Kernel target builds the kernel ELF.
 kernel: $(KERNEL_ELF)
 
@@ -52,8 +48,6 @@ $(KERNEL_ELF): $(KERNEL_OBJ) $(KERNEL_LINKER)
 # Link a 32-bit ELF kernel image.
 	$(LD) -m elf_i386 -T $(KERNEL_LINKER) -o $(KERNEL_ELF) $(KERNEL_OBJ)
 
-# Phony target declaration for iso.
-.PHONY: iso
 # ISO target builds a bootable GRUB ISO.
 iso: $(KERNEL_ELF)
 # Create ISO directories.
@@ -65,15 +59,11 @@ iso: $(KERNEL_ELF)
 # Build the ISO image.
 	grub-mkrescue -o $(ISO_PATH) $(ISO_DIR)
 
-# Phony target declaration for run.
-.PHONY: run
 # Run target boots the ISO in QEMU.
 run: iso
 # Launch QEMU headless with serial output on stdio.
 	qemu-system-x86_64 -cdrom $(ISO_PATH) -display none -serial stdio -no-reboot -no-shutdown
 
-# Phony target declaration for clean.
-.PHONY: clean
 # Clean target removes build artifacts.
 clean:
 # Delete the build directory.
