@@ -74,3 +74,11 @@ A file that represents a bootable CD/DVD. We use it to bundle GRUB + the kernel 
 
 ## QEMU
 An emulator that lets us run our OS in a virtual machine instead of real hardware.
+
+## VMA (Virtual Memory Address)
+The address a section is intended to have when the program is running.
+In our early boot, the VMA is still used even before we set up paging.
+
+## LMA (Load Memory Address)
+The address where a section is loaded into memory by the bootloader.
+For our kernel, VMA and LMA are the same because we are not relocating sections yet.
