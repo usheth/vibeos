@@ -1,7 +1,7 @@
 # Status
 
 ## Current Milestone
-- M1: Boot into 64-bit kernel and print a message
+- M2: Long mode + basic paging
 
 ## Done
 - Repo scaffolded
@@ -10,10 +10,11 @@
 - Toolchain decided: `x86_64-elf` cross-compiler
 - Toolchain built: binutils + gcc installed at `/home/ubuntu/opt/cross`
 - Build/run/test skeleton added (Makefile, linker script, GRUB config, QEMU run target)
+- M1: 32-bit serial output from kernel
 
 ## Next
-- Add long-mode bring-up code and a simple serial print
-- Update boot path to 64-bit and print a message
+- Plan long-mode bring-up steps
+- Switch to 64-bit long mode and print a message
 
 ## Blockers / Questions
 - None yet
@@ -64,7 +65,9 @@
   - `make: Entering directory '/home/ubuntu/code/vibeos'`
   - `mkdir -p build`
   - `x86_64-elf-as --32 kernel/entry.S -o build/entry.o`
-  - `x86_64-elf-ld -m elf_i386 -T kernel/linker.ld -o build/kernel.elf build/entry.o`
+  - `x86_64-elf-gcc -m32 -ffreestanding -fno-pie -fno-pic -fno-stack-protector -nostdlib -c kernel/serial.c -o build/serial.o`
+  - `x86_64-elf-gcc -m32 -ffreestanding -fno-pie -fno-pic -fno-stack-protector -nostdlib -c kernel/kmain.c -o build/kmain.o`
+  - `x86_64-elf-ld -m elf_i386 -T kernel/linker.ld -o build/kernel.elf build/entry.o build/serial.o build/kmain.o`
   - `x86_64-elf-ld: warning: build/kernel.elf has a LOAD segment with RWX permissions`
   - `make: Leaving directory '/home/ubuntu/code/vibeos'`
   - `OK: build/kernel.elf built`
@@ -74,7 +77,7 @@
   - `xorriso 1.5.6 : RockRidge filesystem manipulator, libburnia project.`
   - `ISO image produced: 5801 sectors`
   - `Writing to 'stdio:build/vibeos.iso' completed successfully.`
-- Command: `cd /home/ubuntu/code/vibeos && make run`
+- Command: `cd /home/ubuntu/code/vibeos && PATH="/home/ubuntu/opt/cross/bin:$PATH" tests/test_run_serial.sh`
   Output:
-  - `qemu-system-x86_64 -cdrom build/vibeos.iso -display none -serial stdio -no-reboot -no-shutdown`
-  - `No serial output (kernel currently halts immediately).`
+  - `qemu-system-x86_64: terminating on signal 15 from pid 13729 (timeout)`
+  - `OK: serial hello message found`

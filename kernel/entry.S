@@ -31,12 +31,16 @@ mb2_header_end:
 .code32
 # Export the entry symbol for the linker.
 .global start
+# Import the C entry point.
+.extern kmain
 # Entry point label used by the linker.
 start:
 # Disable interrupts.
 cli
 # Initialize the stack pointer to the top of our stack.
 mov $stack_top, %esp
+# Call the C entry point.
+call kmain
 # Label for the halt loop.
 halt_loop:
 # Halt the CPU until the next interrupt.

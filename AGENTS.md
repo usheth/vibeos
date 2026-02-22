@@ -19,6 +19,7 @@ This repo is built with the help of agents. Keep these rules so the work stays c
 - Provide step-by-step explanations (not just definitions) in `README.md` for boot flow, linking/layout, memory map, and build pipeline.
 - When the user asks “what is X”, ask whether X should be added to `docs/GLOSSARY.md`.
 - When the user selects a strategic or tactical option, record it in `docs/DECISIONS.md`.
+- Explain code changes in detail after applying them.
 - When introducing new file types or build concepts, add or update entries in `docs/GLOSSARY.md`.
 - Do not create files named `all`, `kernel`, `iso`, `run`, or `clean` to avoid Make target conflicts.
 - Only create a milestone document after that milestone is completed.
@@ -41,8 +42,8 @@ Use sparingly and document the reason:
 
 ## Milestones (initial)
 - M0: Toolchain + build skeleton
-- M1: Boot into 64-bit kernel and print a message
-- M2: Basic memory map + paging
+- M1: 32-bit serial print
+- M2: Long mode + basic paging
 - M3: Interrupts + timer
 - M4: Keyboard input + simple shell loop
 - M5: Minimal Unix-like syscall interface

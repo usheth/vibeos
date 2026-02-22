@@ -8,7 +8,7 @@ Minimal x86_64 Unix-like OS for learning OS development, systems programming, an
 - Learn toolchains, low-level debugging, and systems design.
 
 ## Status
-M0 complete (toolchain + build skeleton). M1 next: print a message in 32-bit protected mode (long mode later).
+M0 complete (toolchain + build skeleton). M1 complete (32-bit serial hello). Next: plan long mode.
 
 ## Next
 See `docs/ROADMAP.md` and `docs/DECISIONS.md`.
@@ -43,11 +43,12 @@ This is the *exact* state of the kernel today, with pointers to glossary terms.
 - **Execution flow**:
   - `cli` disables interrupts
   - stack pointer set to `stack_top` in `.bss`
+  - call `kmain` (C) to initialize serial and print
   - `hlt` loop to halt safely
 **Why these steps exist**
 - We disable interrupts to avoid unexpected CPU state changes before we set up handlers.
 - We set a stack because almost every useful operation (calls, pushes, interrupts) depends on it.
-- We halt in a loop because we have no scheduler, no idle task, and no output yet; halting is safe and deterministic.
+- We halt in a loop because we have no scheduler or idle task yet; halting is safe and deterministic.
 
 **Binary format and layout**
 - **ELF format**: `elf32-i386`, which stores sections and metadata so loaders know what to load and where (see `docs/GLOSSARY.md`: ELF)
@@ -56,6 +57,7 @@ This is the *exact* state of the kernel today, with pointers to glossary terms.
 - **Sections present**:
   - `.multiboot2` (header required by GRUB to recognize the kernel)
   - `.text` (executable code; includes `start`)
+  - `.rodata` (read-only data; holds string literals like the hello message)
   - `.bss` (zero-initialized data; holds the early 4 KiB stack)
 - **Addressing**:
   - Section VMAs/LMAs currently match, so “where it runs” equals “where it is loaded” (see `docs/GLOSSARY.md`: VMA, LMA)
@@ -73,22 +75,24 @@ This is the *exact* state of the kernel today, with pointers to glossary terms.
 - Current key addresses:
   - `.multiboot2` VMA `0x0010_0000`
   - `.text` VMA `0x0010_0000`
-  - `.bss`  VMA `0x0010_0010` (size `0x1000`)
+  - `.rodata` VMA `0x0010_0142` (size `0x1b`)
+  - `.bss`  VMA `0x0010_0160` (size `0x1000`)
 **Why 1 MiB**
 - The region below 1 MiB contains legacy BIOS data and is traditionally avoided.
 - 1 MiB is a conventional, well‑understood starting point for early kernels.
 
 **I/O and output**
-- **Output**: none yet (no serial/VGA printing in M0)
-- **Reason**: the current entry code only halts; no print routine is linked
+- **Output**: serial (COM1) from 32-bit C code
+- **Reason**: `kmain` calls `serial_init()` from `kernel/serial.c` and prints a hello string
 
 ## Build Pipeline (Detailed)
 This describes what each Makefile target does and why.
 
 - **`make kernel`**
   - Assembles `kernel/entry.S` into `build/entry.o`.
-  - Links `build/entry.o` with `kernel/linker.ld` to produce `build/kernel.elf`.
-  - Result: a Multiboot2‑compatible 32‑bit ELF kernel.
+  - Compiles `kernel/serial.c` and `kernel/kmain.c` into `build/serial.o` and `build/kmain.o`.
+  - Links all three objects with `kernel/linker.ld` to produce `build/kernel.elf`.
+  - Result: a Multiboot2‑compatible 32‑bit ELF kernel that prints to serial.
 
 - **`make iso`**
   - Creates a staging directory at `build/iso/boot/grub`.
@@ -101,7 +105,7 @@ This describes what each Makefile target does and why.
   - Runs QEMU headless with `-display none`.
   - Routes serial output to the terminal with `-serial stdio`.
   - Uses `-no-reboot -no-shutdown` to keep the session visible on exit.
-  - Result: an emulated boot of the ISO (currently no output because the kernel halts).
+  - Result: an emulated boot of the ISO (serial prints the hello message).
 
 - **`make clean`**
   - Deletes the `build/` directory so the next build starts fresh.
@@ -118,9 +122,10 @@ High memory
 │                                              │
 ├──────────────────────────────────────────────┤
 │ Kernel image (ELF sections) @ 0x0010_0000    │
-│ - .text       VMA 0x0010_0000  (size 0x9)     │
+│ - .text       VMA 0x0010_0000  (size 0x142)   │
 │ - .multiboot2 VMA 0x0010_0000  (size 0x18)    │
-│ - .bss        VMA 0x0010_0010  (size 0x1000)  │
+│ - .rodata     VMA 0x0010_0142  (size 0x1b)    │
+│ - .bss        VMA 0x0010_0160  (size 0x1000)  │
 │   - early stack (4 KiB)                       │
 ├──────────────────────────────────────────────┤
 │ Conventional memory below 1 MiB              │
