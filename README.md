@@ -38,7 +38,8 @@ High memory
 │ - .text (code)                                │
 │ - .rodata (read-only data)                    │
 │ - .data (read/write data)                     │
-│ - .bss (zeroed, includes early stack)         │
+│ - .bss (zeroed)                                │
+│   - early stack (4 KiB)                        │
 ├──────────────────────────────────────────────┤
 │ Conventional memory below 1 MiB              │
 │ (BIOS area, reserved, legacy)                │
