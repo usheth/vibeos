@@ -1,70 +1,47 @@
 # Default shell for recipes.
 SHELL := /bin/bash
-# Cross-compiler prefix.
-CROSS_PREFIX ?= x86_64-elf-
-# Assembler executable.
-AS := $(CROSS_PREFIX)as
-# Linker executable.
-LD := $(CROSS_PREFIX)ld
-# Build output directory.
-BUILD_DIR := build
-# Kernel entry source.
-KERNEL_ENTRY := kernel/entry.S
-# Kernel linker script.
-KERNEL_LINKER := kernel/linker.ld
-# Kernel object file.
-KERNEL_OBJ := $(BUILD_DIR)/entry.o
-# Kernel ELF output.
-KERNEL_ELF := $(BUILD_DIR)/kernel.elf
-# ISO output path.
-ISO_PATH := $(BUILD_DIR)/vibeos.iso
-# ISO staging directory.
-ISO_DIR := $(BUILD_DIR)/iso
-# ISO boot directory.
-ISO_BOOT := $(ISO_DIR)/boot
-# ISO GRUB directory.
-ISO_GRUB := $(ISO_BOOT)/grub
-# GRUB configuration path.
-GRUB_CFG := boot/grub.cfg
 
 # Default target builds the kernel.
 all: kernel
 
 # Kernel target builds the kernel ELF.
-kernel: $(KERNEL_ELF)
+kernel: build/kernel.elf
 
 # Build directory creation target.
-$(BUILD_DIR):
+# Build directory creation target.
+build:
 # Create the build directory if it does not exist.
-	mkdir -p $(BUILD_DIR)
+	mkdir -p build
 
 # Assemble the entry object file.
-$(KERNEL_OBJ): $(KERNEL_ENTRY) | $(BUILD_DIR)
+# Assemble the entry object file.
+build/entry.o: kernel/entry.S | build
 # Assemble 32-bit entry code into an object file.
-	$(AS) --32 $(KERNEL_ENTRY) -o $(KERNEL_OBJ)
+	x86_64-elf-as --32 kernel/entry.S -o build/entry.o
 
 # Link the kernel ELF.
-$(KERNEL_ELF): $(KERNEL_OBJ) $(KERNEL_LINKER)
+# Link the kernel ELF.
+build/kernel.elf: build/entry.o kernel/linker.ld
 # Link a 32-bit ELF kernel image.
-	$(LD) -m elf_i386 -T $(KERNEL_LINKER) -o $(KERNEL_ELF) $(KERNEL_OBJ)
+	x86_64-elf-ld -m elf_i386 -T kernel/linker.ld -o build/kernel.elf build/entry.o
 
 # ISO target builds a bootable GRUB ISO.
-iso: $(KERNEL_ELF)
+iso: build/kernel.elf
 # Create ISO directories.
-	mkdir -p $(ISO_GRUB)
+	mkdir -p build/iso/boot/grub
 # Copy the kernel into the ISO tree.
-	cp $(KERNEL_ELF) $(ISO_BOOT)/kernel.elf
+	cp build/kernel.elf build/iso/boot/kernel.elf
 # Copy the GRUB configuration.
-	cp $(GRUB_CFG) $(ISO_GRUB)/grub.cfg
+	cp boot/grub.cfg build/iso/boot/grub/grub.cfg
 # Build the ISO image.
-	grub-mkrescue -o $(ISO_PATH) $(ISO_DIR)
+	grub-mkrescue -o build/vibeos.iso build/iso
 
 # Run target boots the ISO in QEMU.
 run: iso
 # Launch QEMU headless with serial output on stdio.
-	qemu-system-x86_64 -cdrom $(ISO_PATH) -display none -serial stdio -no-reboot -no-shutdown
+	qemu-system-x86_64 -cdrom build/vibeos.iso -display none -serial stdio -no-reboot -no-shutdown
 
 # Clean target removes build artifacts.
 clean:
 # Delete the build directory.
-	rm -rf $(BUILD_DIR)
+	rm -rf build
