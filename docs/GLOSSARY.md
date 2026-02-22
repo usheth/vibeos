@@ -102,3 +102,7 @@ EFER is accessed via the `rdmsr` and `wrmsr` instructions.
 ## CR4 (Control Register 4)
 An x86 control register used to enable or disable processor features.
 The PAE bit in CR4 must be set before entering long mode.
+
+## COM1 (Serial Port)
+The first legacy serial port on x86 PCs, mapped to I/O port base `0x3F8`.
+Early kernels often write to COM1 so QEMU can display output on the host terminal.
