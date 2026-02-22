@@ -16,6 +16,7 @@ This repo is built with the help of agents. Keep these rules so the work stays c
 - Before every push to GitHub, ensure all markdown documentation is up to date and reflects recent changes.
 - When introducing new file types or build concepts, add or update entries in `docs/GLOSSARY.md`.
 - Do not create files named `all`, `kernel`, `iso`, `run`, or `clean` to avoid Make target conflicts.
+- Only create a milestone document after that milestone is completed.
 
 ## Workflow
 - For each milestone, maintain a checklist in `docs/ROADMAP.md`.
