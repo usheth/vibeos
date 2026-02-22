@@ -17,6 +17,7 @@ This repo is built with the help of agents. Keep these rules so the work stays c
 - When introducing new file types or build concepts, add or update entries in `docs/GLOSSARY.md`.
 - Do not create files named `all`, `kernel`, `iso`, `run`, or `clean` to avoid Make target conflicts.
 - Only create a milestone document after that milestone is completed.
+- Do not debug issues on the user's behalf; answer questions and explain, but let the user perform debugging steps.
 
 ## Workflow
 - For each milestone, maintain a checklist in `docs/ROADMAP.md`.
