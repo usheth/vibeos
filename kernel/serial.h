@@ -41,6 +41,21 @@
 // Transmit protocol (polling):
 // Read LSR until THRE (Transmit Holding Register Empty) (bit 5, 0x20) is 1,
 // then write the byte to Data.
+// Bitmask quick table (selected fields we use):
+// LCR (Line Control Register):
+// - bit 7: DLAB (Divisor Latch Access Bit)
+// - bits 0-1: word length (0b11 = 8 data bits)
+// FCR (FIFO Control Register):
+// - bit 0: FIFO (First-In, First-Out) enable
+// - bit 1: clear RX (receive) FIFO (First-In, First-Out)
+// - bit 2: clear TX (transmit) FIFO (First-In, First-Out)
+// - bits 6-7: RX (receive) trigger level (0b11 = 14-byte threshold)
+// MCR (Modem Control Register):
+// - bit 0: DTR (Data Terminal Ready)
+// - bit 1: RTS (Request To Send)
+// - bit 3: OUT2 (output 2) (IRQ (Interrupt Request) enable gate on PC (personal computer) UARTs)
+// LSR (Line Status Register):
+// - bit 5: THRE (Transmit Holding Register Empty)
 // Header guard start.
 #ifndef VIBEOS_SERIAL_H
 // Header guard define.
