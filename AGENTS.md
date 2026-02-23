@@ -7,6 +7,7 @@ This repo is built with the help of agents. Keep these rules so the work stays c
 - Each milestone should be bootable/testable.
 - Document *why* decisions are made.
 - Keep external dependencies minimal.
+- In comments, expand any acronym on first use (e.g., "DLAB (Divisor Latch Access Bit)").
 - Tests are required for each change unless impossible; accompany changes with a unit or integration test and document exceptions.
 - Add comments above every line of code (unless a file explicitly opts out).
 - When proposing or discussing next steps, educate the user, present options, and collaborate to choose the best path.

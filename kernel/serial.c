@@ -1,3 +1,25 @@
+// COM1 protocol overview (16550-compatible UART):
+// Base I/O port is 0x3F8, and registers are at fixed offsets:
+// +0 Data, +1 IER, +2 FCR, +3 LCR, +4 MCR, +5 LSR.
+// Initialization sequence matters:
+// 1) Disable interrupts (IER=0) because we use polling, not IRQs.
+// 2) Set DLAB (LCR bit 7) so +0/+1 become divisor latch bytes.
+//    Effect: the port map switches from Data/IER to DLL/DLM, letting us
+//    program the baud-rate divisor without racing a live data stream.
+// 3) Program baud divisor: DLL=0x03, DLM=0x00 for 38400 (115200/3).
+//    Effect: the UART clock is divided by 3, so each bit lasts longer and
+//    the wire speed becomes 38400 bits/second (must match the receiver).
+// 4) Clear DLAB and set line format: LCR=0x03 (8 data bits, no parity, 1 stop).
+//    Effect: restores normal Data/IER access and defines the frame format
+//    (8-N-1) so both ends agree on byte boundaries.
+// 5) Enable FIFO and clear buffers (FCR=0xC7).
+//    Effect: turns on the transmit/receive FIFOs, flushes stale bytes, and
+//    sets a 14-byte RX threshold to reduce overrun risk.
+// 6) Set MCR=0x0B to enable basic modem control lines.
+//    Effect: asserts DTR/RTS and sets OUT2 so the UART can signal an IRQ
+//    line if interrupts were later enabled (safe default in QEMU/PC UARTs).
+// Transmit protocol (polling):
+// Read LSR until THRE (bit 5, 0x20) is 1, then write the byte to Data.
 // Include the serial interface.
 #include "serial.h"
 // Define an 8-bit unsigned type.
