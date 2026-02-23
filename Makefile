@@ -48,6 +48,11 @@ run: iso
 # Launch QEMU headless with serial output on stdio.
 	qemu-system-x86_64 -cdrom build/vibeos.iso -display none -serial stdio -no-reboot -no-shutdown
 
+# Quickrun target uses the helper script.
+quickrun:
+# Run the build-and-run helper script.
+	bash scripts/build_and_run.sh
+
 # Clean target removes build artifacts.
 clean:
 # Delete the build directory.
