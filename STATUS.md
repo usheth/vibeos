@@ -11,6 +11,10 @@
 - Toolchain built: binutils + gcc installed at `/home/ubuntu/opt/cross`
 - Build/run/test skeleton added (Makefile, linker script, GRUB config, QEMU run target)
 - M1: 32-bit serial output from kernel
+- COM1 documentation expanded; UART register acronyms added to glossary
+- Serial driver updated to use named bit masks instead of magic numbers
+- Build-and-run helper script added (`scripts/build_and_run.sh`)
+- `make quickrun` target added
 
 ## Next
 - Plan long-mode bring-up steps
@@ -19,7 +23,7 @@
 ## Blockers / Questions
 - None yet
 
-## Verification (2026-02-22)
+## Verification (2026-02-23)
 - Command: `ls /home/ubuntu/opt/cross/bin`
   Output:
   - `x86_64-elf-addr2line`
@@ -71,13 +75,26 @@
   - `x86_64-elf-ld: warning: build/kernel.elf has a LOAD segment with RWX permissions`
   - `make: Leaving directory '/home/ubuntu/code/vibeos'`
   - `OK: build/kernel.elf built`
-- Command: `cd /home/ubuntu/code/vibeos && make iso`
-  Output:
-  - `grub-mkrescue -o build/vibeos.iso build/iso`
-  - `xorriso 1.5.6 : RockRidge filesystem manipulator, libburnia project.`
-  - `ISO image produced: 5801 sectors`
-  - `Writing to 'stdio:build/vibeos.iso' completed successfully.`
 - Command: `cd /home/ubuntu/code/vibeos && PATH="/home/ubuntu/opt/cross/bin:$PATH" tests/test_run_serial.sh`
   Output:
-  - `qemu-system-x86_64: terminating on signal 15 from pid 13729 (timeout)`
+  - `make: Entering directory '/home/ubuntu/code/vibeos'`
+  - `mkdir -p build/iso/boot/grub`
+  - `cp build/kernel.elf build/iso/boot/kernel.elf`
+  - `cp boot/grub.cfg build/iso/boot/grub/grub.cfg`
+  - `grub-mkrescue -o build/vibeos.iso build/iso`
+  - `xorriso 1.5.6 : RockRidge filesystem manipulator, libburnia project.`
+  - `Drive current: -outdev 'stdio:build/vibeos.iso'`
+  - `Media current: stdio file, overwriteable`
+  - `Media status : is blank`
+  - `Media summary: 0 sessions, 0 data blocks, 0 data, 87.7g free`
+  - `Added to ISO image: directory '/'='/tmp/grub.gHXQ3J'`
+  - `xorriso : UPDATE :     588 files added in 1 seconds`
+  - `Added to ISO image: directory '/'='/home/ubuntu/code/vibeos/build/iso'`
+  - `xorriso : UPDATE :     592 files added in 1 seconds`
+  - `xorriso : NOTE : Copying to System Area: 512 bytes from file '/usr/lib/grub/i386-pc/boot_hybrid.img'`
+  - `ISO image produced: 5801 sectors`
+  - `Written to medium : 5801 sectors at LBA 0`
+  - `Writing to 'stdio:build/vibeos.iso' completed successfully.`
+  - `make: Leaving directory '/home/ubuntu/code/vibeos'`
+  - `qemu-system-x86_64: terminating on signal 15 from pid 22277 (timeout)`
   - `OK: serial hello message found`
