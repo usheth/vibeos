@@ -106,3 +106,15 @@ The PAE bit in CR4 must be set before entering long mode.
 ## COM1 (Serial Port)
 The first legacy serial port on x86 PCs, mapped to I/O port base `0x3F8`.
 Early kernels often write to COM1 so QEMU can display output on the host terminal.
+Common COM1 registers (offsets from base `0x3F8`):
+- Data Register (`+0`): transmit or receive a byte.
+- Interrupt Enable Register (`+1`): enables serial interrupts (we keep it off for polling).
+- FIFO Control Register (`+2`): enables and configures FIFOs.
+- Line Control Register (`+3`): sets data bits/parity/stop bits and the DLAB flag.
+- Modem Control Register (`+4`): controls modem lines; often set to enable RTS/DSR.
+- Line Status Register (`+5`): reports TX/RX status; bit 5 (THRE) indicates TX empty.
+Protocol summary:
+- We use **8-N-1**: 8 data bits, no parity, 1 stop bit.
+- We poll the Line Status Register until the transmitter is ready, then write to the Data Register.
+Baud rate summary:
+- Set DLAB=1 in LCR, write the divisor to DLL/DLM, then clear DLAB and set 8‑N‑1.

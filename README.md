@@ -110,6 +110,38 @@ This describes what each Makefile target does and why.
 - **`make clean`**
   - Deletes the `build/` directory so the next build starts fresh.
 
+## Serial Output (COM1 Details)
+We use COM1 for early output because it is simple, reliable, and works in headless QEMU.
+
+**COM1 base address**
+- Base I/O port: `0x3F8`
+- Registers are accessed by adding offsets to this base.
+
+**Registers we use (offsets from `0x3F8`)**
+- `+0` **Data Register**: write a byte to transmit; read a byte to receive.
+- `+1` **Interrupt Enable Register (IER)**: we set this to 0 to use polling.
+- `+2` **FIFO Control Register (FCR)**: we enable FIFO and clear buffers.
+- `+3` **Line Control Register (LCR)**: sets 8‑N‑1 and toggles DLAB for baud rate.
+- `+4` **Modem Control Register (MCR)**: enables RTS/DSR lines (basic modem control).
+- `+5` **Line Status Register (LSR)**: status flags; bit 5 (**THRE**) means TX buffer is empty.
+
+**Baud rate setup (DLAB + divisor)**
+- To set the baud rate, LCR bit 7 (**DLAB**) is set to 1.
+- With DLAB=1, the Data and IER registers become the **Divisor Latch**:
+  - `+0` = Divisor Latch Low (DLL)
+  - `+1` = Divisor Latch High (DLM)
+- We set DLL to `0x03` and DLM to `0x00`, which gives **38400 baud** (given a 115200 base clock).
+- After setting the divisor, DLAB is cleared and LCR is set to `0x03` for **8‑N‑1**.
+
+**Protocol (how a character is sent)**
+1. Read LSR until TX‑empty is set.
+2. Write the character to the Data Register.
+
+**Why this is safe early**
+- No interrupts required (pure polling).
+- Minimal hardware setup.
+- QEMU exposes COM1 output directly to the host terminal.
+
 ## Memory Map (Early Boot)
 Below is a simplified, not-to-scale view of where the kernel is loaded right now.
 This is based on our linker script, which places the kernel at 1 MiB.
