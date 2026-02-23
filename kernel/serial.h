@@ -34,8 +34,10 @@
 //    Effect: turns on the transmit/receive FIFOs, flushes stale bytes, and
 //    sets a 14-byte RX (receive) threshold to reduce overrun risk.
 // 6) Set MCR=0x0B to enable basic modem control lines.
-//    Effect: asserts DTR/RTS and sets OUT2 so the UART can signal an IRQ
-//    line if interrupts were later enabled (safe default in QEMU/PC UARTs).
+//    Effect: asserts DTR (Data Terminal Ready) / RTS (Request To Send) and
+//    sets OUT2 (output 2) so the UART can signal an IRQ line if interrupts
+//    were later enabled (safe default in QEMU (Quick Emulator) / PC (personal
+//    computer) UARTs).
 // Transmit protocol (polling):
 // Read LSR until THRE (Transmit Holding Register Empty) (bit 5, 0x20) is 1,
 // then write the byte to Data.

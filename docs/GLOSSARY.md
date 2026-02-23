@@ -108,13 +108,66 @@ The first legacy serial port on x86 PCs, mapped to I/O port base `0x3F8`.
 Early kernels often write to COM1 so QEMU can display output on the host terminal.
 Common COM1 registers (offsets from base `0x3F8`):
 - Data Register (`+0`): transmit or receive a byte.
-- Interrupt Enable Register (`+1`): enables serial interrupts (we keep it off for polling).
-- FIFO Control Register (`+2`): enables and configures FIFOs.
-- Line Control Register (`+3`): sets data bits/parity/stop bits and the DLAB flag.
-- Modem Control Register (`+4`): controls modem lines; often set to enable RTS/DSR.
-- Line Status Register (`+5`): reports TX/RX status; bit 5 (THRE) indicates TX empty.
+- Interrupt Enable Register (IER) (`+1`): enables serial interrupts (we keep it off for polling).
+- FIFO (First-In, First-Out) Control Register (FCR) (`+2`): enables and configures FIFOs.
+- Line Control Register (LCR) (`+3`): sets data bits/parity/stop bits and the DLAB flag.
+- Modem Control Register (MCR) (`+4`): controls modem lines; often set to enable RTS (Request To Send) and DTR (Data Terminal Ready).
+- Line Status Register (LSR) (`+5`): reports TX (transmit) / RX (receive) status; bit 5 (THRE) indicates TX empty.
 Protocol summary:
 - We use **8-N-1**: 8 data bits, no parity, 1 stop bit.
 - We poll the Line Status Register until the transmitter is ready, then write to the Data Register.
 Baud rate summary:
-- Set DLAB=1 in LCR, write the divisor to DLL/DLM, then clear DLAB and set 8‑N‑1.
+- Set DLAB (Divisor Latch Access Bit)=1 in LCR, write the divisor to DLL (Divisor Latch Low) / DLM (Divisor Latch High), then clear DLAB and set 8‑N‑1.
+
+## UART (Universal Asynchronous Receiver/Transmitter)
+A hardware device that converts bytes to a serial bit stream and back.
+PC serial ports like COM1 are implemented with UARTs (often 16550-compatible).
+
+## FIFO (First-In, First-Out)
+A small queue that stores bytes in the order they arrive.
+UART FIFOs reduce the chance of losing data when the CPU is busy.
+
+## IER (Interrupt Enable Register)
+The UART register that turns specific UART interrupts on or off.
+When IER is zero, the UART does not raise serial interrupts.
+
+## LCR (Line Control Register)
+The UART register that sets line format (data bits, parity, stop bits).
+LCR also contains the DLAB bit that controls access to the divisor latches.
+
+## DLAB (Divisor Latch Access Bit)
+A bit in LCR that switches I/O port addresses between normal registers and the divisor latch registers.
+When DLAB is set, the Data and IER registers become DLL and DLM.
+
+## DLL (Divisor Latch Low)
+The low byte of the UART baud-rate divisor.
+Used together with DLM to form a 16-bit divisor.
+
+## DLM (Divisor Latch High)
+The high byte of the UART baud-rate divisor.
+Used together with DLL to form a 16-bit divisor.
+
+## FCR (FIFO Control Register)
+The UART register that enables FIFOs and clears their contents.
+It also configures the receive FIFO trigger threshold.
+
+## MCR (Modem Control Register)
+The UART register that controls modem signals such as DTR and RTS.
+On PC UARTs, setting OUT2 is required for IRQ routing if interrupts are enabled.
+
+## LSR (Line Status Register)
+The UART register that reports transmit and receive status bits.
+We poll LSR to know when it is safe to transmit the next byte.
+
+## THRE (Transmit Holding Register Empty)
+An LSR status bit that indicates the transmit holding register is empty.
+When THRE is set, the UART can accept another byte for transmission.
+
+## RTS (Request To Send)
+A modem control signal that indicates the sender is ready to transmit.
+
+## DTR (Data Terminal Ready)
+A modem control signal that indicates the terminal is ready.
+
+## OUT2 (Output 2)
+A modem control output used on PC UARTs for IRQ routing.
